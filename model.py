@@ -8,10 +8,7 @@ manager.add_command('db', MigrateCommand)
 
 # **** Import models from folder **** #
 from models.admin.User import *
-# from models.Budget import *
-# from models.Provider import *
-# from models.Invoice import *
-# from models.Transaction import *
+# Include others models you apps needs
 
 # **** Manage migration from cmd **** #
 if __name__ == '__main__':

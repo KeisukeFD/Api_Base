@@ -43,6 +43,13 @@ or
 $ python app.py
 ```
 
+##### Seeds
+```
+$ pipenv shell
+$ # Must run migration first.
+$ python model.py seed
+```
+
 ### Built with
 - [Flask](http://flask.pocoo.org/)
 - [Flask-Migrate](https://flask-migrate.readthedocs.io/en/latest/)

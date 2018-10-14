@@ -21,7 +21,8 @@ def upgrade():
     op.create_table('role',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -29,7 +30,9 @@ def upgrade():
     sa.Column('password', sa.String(length=800), nullable=False),
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('reset_token', sa.String(length=800), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('username'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('session',
     sa.Column('created', sa.DateTime(), nullable=False),

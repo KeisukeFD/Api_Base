@@ -11,9 +11,9 @@ user_role = db.Table('user_role',
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(200), nullable=False)
+    username = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(800), nullable=False)
-    email = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False, unique=True)
     reset_token = db.Column(db.String(800))
     roles = db.relationship('Role', secondary=user_role, backref=db.backref('users', lazy=True), lazy='subquery')
 
@@ -32,7 +32,7 @@ class User(db.Model):
 
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
 
 
 class Session(db.Model, TimestampMixin):

@@ -44,7 +44,7 @@ def login():
         else:
             SessionService.instance().set(someone.id, token, expiration)
 
-        return shortcuts.success('Welcome inside !', token=token.decode('UTF-8'))
+        return shortcuts.success('Welcome inside !', token=token)
     except Exception as e:
         LoggerService.instance().debug(e)
         return shortcuts.error('Invalid login !'), 401

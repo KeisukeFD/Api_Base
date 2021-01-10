@@ -1,5 +1,6 @@
-from passlib.hash import pbkdf2_sha512
-from app import db, marshmallow
+from passlib.hash import bcrypt_sha256
+from string import ascii_letters
+from app import db, marshmallow, config
 from marshmallow import fields
 from models.utils.Mixins import TimestampMixin
 
@@ -22,11 +23,15 @@ class User(db.Model):
         self.email = email
         self.set_password(password)
 
+    def _get_salt(self):
+        secret = [c for c in config['SECRET_KEY'] if c in ascii_letters]
+        return ''.join(secret)[:22].ljust(22, '9')
+
     def set_password(self, plain_password):
-        self.password = pbkdf2_sha512.hash(plain_password)
+        self.password = bcrypt_sha256.using(salt=self._get_salt()).hash(plain_password)
 
     def verify_password(self, password):
-        if not pbkdf2_sha512.verify(password, self.password):
+        if not bcrypt_sha256.using(salt=self._get_salt()).verify(password, self.password):
             raise Exception('Invalid password !')
 
 
@@ -48,13 +53,13 @@ class Session(db.Model, TimestampMixin):
 
 
 # ******** JSON Serialization Schemas ******** #
-class RoleSchema(marshmallow.ModelSchema):
+class RoleSchema(marshmallow.Schema):
     class Meta:
         model = Role
         fields = ('id', 'name')
 
 
-class UserSchema(marshmallow.ModelSchema):
+class UserSchema(marshmallow.Schema):
     roles = fields.Nested(RoleSchema, many=True)
 
     class Meta:

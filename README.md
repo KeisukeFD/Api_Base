@@ -6,17 +6,15 @@ A very simple API base framework made with Flask.
 
 ### Prerequisites
 
-- Python3
-- Pipenv
+- Python3.8
+- virtualenv
 
 ### Installing
 
 ```
 $ git clone git@bitbucket.org:keisukefd/api_base.git
 $ cd api_base/
-$ # If needed pre-install the right python version from your system, example:
-$ # pipenv --python /usr/local/Cellar/python/3.6.5_1/bin/python3
-$ pipenv install
+$ pip install -r requirements.txt
 ```
 
 ### Configuration
@@ -30,13 +28,13 @@ configs/
 
 ##### Run migration
 ```
-$ pipenv shell
+$ python model.py db stamp head
+$ python model.py db migrate
 $ python model.py db upgrade
 ```
 
 ##### Runing dev
 ```
-$ pipenv shell
 $ export FLASK_ENV=development
 $ flask run
 or
@@ -45,7 +43,6 @@ $ python app.py
 
 ##### Seeds
 ```
-$ pipenv shell
 $ # Must run migration first.
 $ python model.py seed
 ```

@@ -7,11 +7,6 @@ class Config:
 
     ADMIN_PREFIX = '/admin'
 
-    TAXES = {
-        'PST': 0.09975,
-        'GST': 0.05
-    }
-
     # # Python Logging
     LOGGERS = {
         'version': 1,

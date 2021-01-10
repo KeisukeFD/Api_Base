@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
 from flask import Blueprint, request
 
+from utils.decorators import json_validate
+
 bp = Blueprint('default', __name__)
 
-from app import schema
+# from app import schema
 from models.schemas.admin.login import login_schema
 from services.authentication import AuthService
 from services.sessions import SessionService
@@ -19,14 +21,13 @@ def home():
 
 
 @bp.route('/login', methods=['POST'])
-@schema.validate(login_schema)
+@json_validate(login_schema)
 @logging
 def login():
     data = request.get_json()
     try:
         someone = AuthService.instance().login(data['username'], data['password'])
         now = datetime.utcnow()
-        expiration = now + timedelta(minutes=5)
         payload = {
             'exp': expiration,
             'iat': now,

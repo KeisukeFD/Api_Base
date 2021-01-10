@@ -2,10 +2,10 @@ from flask import Blueprint, request
 
 bp = Blueprint('admin-users', __name__)
 
-from app import db, schema
+from app import db
 from utils import shortcuts
-from utils.decorators import required_authorization, required_role
-from model import User, UserSchema, Role, RoleSchema
+from utils.decorators import required_authorization, required_role, json_validate
+from model import User, UserSchema, Role
 from models.schemas.admin.user import new_user_schema, edit_user_schema, user_roles_schema
 
 DEFAULT_ADMIN_ROLE = "Admin"
@@ -39,7 +39,7 @@ def get_all_users(payload):
     users = User.query.all()
     if users:
         users = UserSchema(many=True).dump(users)
-        return shortcuts.success(None, users=users.data)
+        return shortcuts.success(None, users=users)
     return shortcuts.error('Not found !'), 404
 
 
@@ -53,21 +53,10 @@ def get_user(payload, user_id):
     return shortcuts.error('Not found !'), 404
 
 
-@bp.route('/roles', methods=['GET'])
-@required_authorization
-@required_role([DEFAULT_ADMIN_ROLE])
-def get_roles(payload):
-    roles = Role.query.all()
-    if roles:
-        roles = RoleSchema(many=True).dump(roles)
-        return shortcuts.success(None, roles=roles)
-    return shortcuts.error('Not found !'), 404
-
-
 @bp.route('/<int:user_id>', methods=['PUT'])
 @required_authorization
 @required_role([DEFAULT_ADMIN_ROLE])
-@schema.validate(edit_user_schema)
+@json_validate(edit_user_schema)
 def edit_user(payload, user_id):
     try:
         data = request.get_json()
@@ -113,7 +102,7 @@ def delete_user(payload, user_id):
 @bp.route('/', methods=['POST'])
 @required_authorization
 @required_role([DEFAULT_ADMIN_ROLE])
-@schema.validate(new_user_schema)
+@json_validate(new_user_schema)
 def add_user(payload):
     if not request.get_json():
         return shortcuts.error('Malformed request'), 400
@@ -136,7 +125,7 @@ def add_user(payload):
 @bp.route('/<int:user_id>/roles', methods=['PUT'])
 @required_authorization
 @required_role([DEFAULT_ADMIN_ROLE])
-@schema.validate(user_roles_schema)
+@json_validate(user_roles_schema)
 def set_user_roles(payload, user_id):
     try:
         user = User.query.filter_by(id=user_id).first()

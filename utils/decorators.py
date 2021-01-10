@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import request
+from jsonschema.validators import validator_for
 from services.sessions import SessionService
 from .functions import verify_token
 from .shortcuts import error
@@ -27,7 +28,7 @@ def required_authorization(f):
         try:
             auth = request.headers['Authorization'].split()
             LoggerService.instance().log(info="Trying to validate authorization access.")
-            if auth[0] == 'Bearer':
+            if len(auth) == 2 and auth[0] == 'Bearer':
                 LoggerService.instance().debug("Verifying token")
                 payload = verify_token(auth[1])
                 LoggerService.instance().debug("Getting active session for 'user_id=%s'" % payload['sub'])
@@ -62,5 +63,23 @@ def required_role(roles):
                 pass
             if not found:
                 return error(['Forbidden: One of these roles are required', roles]), 403
+        return wrapper
+    return decorated_func
+
+
+def json_validate(json_schema):
+    def decorated_func(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            try:
+                cls = validator_for(json_schema)
+                cls.check_schema(json_schema)
+                validator = cls(json_schema)
+                errors = list(validator.iter_errors(request.get_json()))
+                if errors:
+                    return error(['Error validating against schema', [e.message for e in errors]])
+            except Exception as _:
+                return error(['Json Validation failed']), 400
+            return f(*args, **kwargs)
         return wrapper
     return decorated_func

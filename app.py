@@ -2,17 +2,8 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from flask_json_schema import JsonSchema, JsonValidationError
 
 app = Flask(__name__)
-schema = JsonSchema(app)
-
-
-# **** error handler for json schema **** #
-@app.errorhandler(JsonValidationError)
-def validation_error(e):
-    from utils.shortcuts import error
-    return error([e.message]+[error.message for error in e.errors])
 
 
 # **** Getting Environment mode **** #
@@ -38,6 +29,8 @@ from admin import default as default_admin
 app.register_blueprint(default_admin.bp, url_prefix=config['ADMIN_PREFIX'])
 from admin import users as admin_users
 app.register_blueprint(admin_users.bp, url_prefix='%s/users' % config['ADMIN_PREFIX'])
+from admin import roles as admin_roles
+app.register_blueprint(admin_roles.bp, url_prefix='%s/roles' % config['ADMIN_PREFIX'])
 
 from routes import default
 app.register_blueprint(default.bp, url_prefix='/')

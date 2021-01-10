@@ -48,6 +48,7 @@ def required_role(roles):
     def decorated_func(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
+            found = False
             try:
                 user_id = args[0]['sub']
                 user_roles = AuthService.instance().get_user_roles(user_id)
@@ -55,9 +56,11 @@ def required_role(roles):
                                              debug="roles [%s] for 'user_id=%s'" % (",".join([r.name for r in user_roles]), user_id))
                 for user_role in user_roles:
                     if user_role.name.upper() in [r.upper() for r in roles]:
+                        found = True
                         return f(*args, **kwargs)
             except Exception as _:
                 pass
-            return error(['Forbidden: One of these roles are required', roles]), 403
+            if not found:
+                return error(['Forbidden: One of these roles are required', roles]), 403
         return wrapper
     return decorated_func

@@ -49,7 +49,7 @@ def get_all_users(payload):
 def get_user(payload, user_id):
     user = User.query.filter_by(id=user_id).first()
     if user:
-        return shortcuts.success('', user=UserSchema().dump(user).data)
+        return shortcuts.success('', user=UserSchema().dump(user))
     return shortcuts.error('Not found !'), 404
 
 
@@ -60,7 +60,7 @@ def get_roles(payload):
     roles = Role.query.all()
     if roles:
         roles = RoleSchema(many=True).dump(roles)
-        return shortcuts.success(None, roles=roles.data)
+        return shortcuts.success(None, roles=roles)
     return shortcuts.error('Not found !'), 404
 
 
